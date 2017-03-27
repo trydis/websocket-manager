@@ -12,18 +12,24 @@ namespace WebSocketManager
 {
     public abstract class WebSocketHandler
     {
-        protected WebSocketConnectionManager WebSocketConnectionManager { get; set; }
+        protected IWebSocketConnectionManager WebSocketConnectionManager { get; set; }
         private JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings()
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
-        public WebSocketHandler(WebSocketConnectionManager webSocketConnectionManager)
+
+        public WebSocketHandler(IWebSocketConnectionManager webSocketConnectionManager)
         {
             WebSocketConnectionManager = webSocketConnectionManager;
         }
 
         public virtual async Task OnConnected(WebSocket socket)
         {
+            if (socket == null)
+            {
+                throw new ArgumentNullException(nameof(socket));
+            }
+
             WebSocketConnectionManager.AddSocket(socket);
 
             await SendMessageAsync(socket, new Message()
